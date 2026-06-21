@@ -12,6 +12,9 @@ from presentation.http.schemas import (
     AvatarUploadResponse,
     ProfileMetaOption,
     ProfileMetaResponse,
+    ProfileNameSummariesRequest,
+    ProfileNameSummariesResponse,
+    ProfileNameSummaryItem,
     ProfileResponse,
     QuestionnaireStatusResponse,
     UpsertProfileRequest,
@@ -151,6 +154,16 @@ class ProfileHttpHandler:
             self._error_translator.raise_http_error(exc)
         except Exception as exc:  # pragma: no cover
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="media not found") from exc
+        raise AssertionError("unreachable")
+
+    def list_profile_name_summaries(self, payload: ProfileNameSummariesRequest) -> ProfileNameSummariesResponse:
+        try:
+            with self._runtime.profile_service_scope() as profile_service:
+                names_map = profile_service.get_profile_name_summaries(payload.user_ids)
+                items = [ProfileNameSummaryItem(user_id=user_id, full_name=names_map.get(user_id)) for user_id in payload.user_ids]
+                return ProfileNameSummariesResponse(items=items)
+        except ProfileError as exc:
+            self._error_translator.raise_http_error(exc)
         raise AssertionError("unreachable")
 
     @staticmethod

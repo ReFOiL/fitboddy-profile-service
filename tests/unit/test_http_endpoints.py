@@ -238,3 +238,53 @@ def test_avatar_media_proxy_success() -> None:
         assert response.status_code == 200
         assert response.headers["content-type"].startswith("image/jpeg")
         assert response.content == b"img-bytes"
+
+
+def test_internal_profile_name_summaries() -> None:
+    with _client() as client:
+        _mock_access_context(user_id="trainer-1", role="trainer")
+        create_client_one = client.put(
+            "/api/v1/profiles/client-name-1",
+            headers={"Authorization": "Bearer token"},
+            json={
+                "full_name": "Анна Иванова",
+                "city": None,
+                "bio": None,
+                "goal": "maintenance",
+                "experience_level": "beginner",
+                "workout_location": "home",
+                "equipment": ["none"],
+                "limitations": None,
+                "medical_notes": None,
+            },
+        )
+        assert create_client_one.status_code == 200
+        create_client_two = client.put(
+            "/api/v1/profiles/client-name-2",
+            headers={"Authorization": "Bearer token"},
+            json={
+                "full_name": "Борис Петров",
+                "city": None,
+                "bio": None,
+                "goal": "maintenance",
+                "experience_level": "beginner",
+                "workout_location": "home",
+                "equipment": ["none"],
+                "limitations": None,
+                "medical_notes": None,
+            },
+        )
+        assert create_client_two.status_code == 200
+
+        response = client.post(
+            "/api/v1/profiles/internal/summaries",
+            json={"user_ids": ["client-name-1", "client-name-2", "missing-user"]},
+        )
+        assert response.status_code == 200
+        items = response.json()["items"]
+        assert items[0]["user_id"] == "client-name-1"
+        assert items[0]["full_name"] == "Анна Иванова"
+        assert items[1]["user_id"] == "client-name-2"
+        assert items[1]["full_name"] == "Борис Петров"
+        assert items[2]["user_id"] == "missing-user"
+        assert items[2]["full_name"] is None

@@ -87,6 +87,13 @@ class ProfileService:
         self._session.commit()
         return self._mapper.to_domain(model)
 
+    def get_profile_name_summaries(self, user_ids: list[str]) -> dict[str, str | None]:
+        normalized_ids = [item.strip() for item in user_ids if item.strip()]
+        unique_ids = list(dict.fromkeys(normalized_ids))
+        if not unique_ids:
+            return {}
+        return self._profiles.get_full_names_by_user_ids(self._PROFILE_TENANT_SCOPE, unique_ids)
+
     @staticmethod
     def _ensure_write_access(acting_user_id: str, acting_role: str, target_user_id: str) -> None:
         if acting_role == "client" and acting_user_id != target_user_id:

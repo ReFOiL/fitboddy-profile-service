@@ -3,6 +3,8 @@ from fastapi import APIRouter, File, Header, HTTPException, Request, UploadFile,
 from presentation.http.schemas import (
     AvatarUploadResponse,
     ProfileMetaResponse,
+    ProfileNameSummariesRequest,
+    ProfileNameSummariesResponse,
     ProfileResponse,
     QuestionnaireStatusResponse,
     UpsertProfileRequest,
@@ -37,6 +39,12 @@ class ProfileRoutes:
             response_model=QuestionnaireStatusResponse,
         )
         self.router.add_api_route(
+            "/internal/summaries",
+            self.list_profile_name_summaries,
+            methods=["POST"],
+            response_model=ProfileNameSummariesResponse,
+        )
+        self.router.add_api_route(
             "/{user_id}/avatar",
             self.upload_avatar,
             methods=["POST"],
@@ -68,6 +76,13 @@ class ProfileRoutes:
     @staticmethod
     def get_questionnaire_status(request: Request, user_id: str) -> QuestionnaireStatusResponse:
         return request.app.state.profile_handler.get_questionnaire_status(user_id)
+
+    @staticmethod
+    def list_profile_name_summaries(
+        request: Request,
+        payload: ProfileNameSummariesRequest,
+    ) -> ProfileNameSummariesResponse:
+        return request.app.state.profile_handler.list_profile_name_summaries(payload)
 
     @staticmethod
     def get_profile_meta(request: Request) -> ProfileMetaResponse:

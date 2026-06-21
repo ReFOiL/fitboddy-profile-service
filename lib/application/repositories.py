@@ -4,6 +4,7 @@ import json
 from datetime import UTC, datetime
 from uuid import uuid4
 
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from application.models import ClientProfileModel
@@ -86,6 +87,16 @@ class ClientProfileRepository:
             and bool((profile.experience_level or "").strip())
             and bool((profile.workout_location or "").strip())
         )
+
+    def get_full_names_by_user_ids(self, tenant_id: str, user_ids: list[str]) -> dict[str, str | None]:
+        if not user_ids:
+            return {}
+        statement = (
+            select(ClientProfileModel.user_id, ClientProfileModel.full_name)
+            .where(ClientProfileModel.tenant_id == tenant_id, ClientProfileModel.user_id.in_(user_ids))
+        )
+        rows = self._session.execute(statement).all()
+        return {user_id: full_name for user_id, full_name in rows}
 
     def set_avatar_url(self, tenant_id: str, user_id: str, avatar_url: str) -> ClientProfileModel:
         profile = self.find_by_tenant_user(tenant_id, user_id)

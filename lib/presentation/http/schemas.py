@@ -64,3 +64,16 @@ class ProfileMetaResponse(BaseModel):
     levels: list[ProfileMetaOption]
     workout_locations: list[ProfileMetaOption]
     equipment: list[ProfileMetaOption]
+
+
+class ProfileNameSummariesRequest(BaseModel):
+    user_ids: list[str] = Field(default_factory=list, max_length=500)
+
+
+class ProfileNameSummaryItem(BaseModel):
+    user_id: str
+    full_name: str | None
+
+
+class ProfileNameSummariesResponse(BaseModel):
+    items: list[ProfileNameSummaryItem]
