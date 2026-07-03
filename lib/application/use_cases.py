@@ -98,6 +98,8 @@ class ProfileService:
     def _ensure_write_access(acting_user_id: str, acting_role: str, target_user_id: str) -> None:
         if acting_role == "client" and acting_user_id != target_user_id:
             raise ForbiddenError("client can update only own profile")
+        if acting_role == "trainer" and acting_user_id != target_user_id:
+            raise ForbiddenError("trainer can update only own profile")
 
     @staticmethod
     def _ensure_read_access(acting_user_id: str, acting_role: str, target_user_id: str) -> None:

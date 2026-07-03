@@ -104,7 +104,7 @@ def test_client_profile_requires_questionnaire_fields() -> None:
         assert "goal is required" in response.json()["detail"]
 
 
-def test_trainer_can_edit_client_profile() -> None:
+def test_trainer_cannot_edit_client_profile() -> None:
     with _client() as client:
         _mock_access_context(user_id="trainer-1", role="trainer")
         response = client.put(
@@ -122,9 +122,7 @@ def test_trainer_can_edit_client_profile() -> None:
                 "medical_notes": "monitor pain",
             },
         )
-        assert response.status_code == 200
-        assert response.json()["user_id"] == "client-3"
-        assert response.json()["city"] == "Melbourne"
+        assert response.status_code == 403
 
 
 def test_internal_questionnaire_status_endpoint() -> None:
@@ -242,7 +240,7 @@ def test_avatar_media_proxy_success() -> None:
 
 def test_internal_profile_name_summaries() -> None:
     with _client() as client:
-        _mock_access_context(user_id="trainer-1", role="trainer")
+        _mock_access_context(user_id="client-name-1", role="client")
         create_client_one = client.put(
             "/api/v1/profiles/client-name-1",
             headers={"Authorization": "Bearer token"},
@@ -259,6 +257,7 @@ def test_internal_profile_name_summaries() -> None:
             },
         )
         assert create_client_one.status_code == 200
+        _mock_access_context(user_id="client-name-2", role="client")
         create_client_two = client.put(
             "/api/v1/profiles/client-name-2",
             headers={"Authorization": "Bearer token"},
