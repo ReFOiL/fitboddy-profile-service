@@ -110,13 +110,11 @@ class ProfileHttpHandler:
                 ProfileMetaOption(value="gym", label="Зал"),
             ],
             equipment=[
-                ProfileMetaOption(value="none", label="Без инвентаря"),
                 ProfileMetaOption(value="dumbbells", label="Гантели"),
                 ProfileMetaOption(value="barbell", label="Штанга"),
                 ProfileMetaOption(value="resistance_bands", label="Эспандеры / резинки"),
                 ProfileMetaOption(value="kettlebell", label="Гиря"),
                 ProfileMetaOption(value="treadmill", label="Беговая дорожка"),
-                ProfileMetaOption(value="other", label="Другое"),
             ],
         )
 

@@ -160,6 +160,10 @@ def test_profile_meta_endpoint() -> None:
         assert isinstance(body["workout_locations"], list)
         assert isinstance(body["equipment"], list)
         assert any(item["value"] == "home" for item in body["workout_locations"])
+        equipment_values = {item["value"] for item in body["equipment"]}
+        assert "none" not in equipment_values
+        assert "other" not in equipment_values
+        assert "dumbbells" in equipment_values
 
 
 def test_missing_bearer_token_returns_401() -> None:
