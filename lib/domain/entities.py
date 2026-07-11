@@ -14,7 +14,7 @@ class ClientProfile:
     goal: str | None
     experience_level: str | None
     workout_location: str | None
-    equipment: list[str]
+    unavailable_equipment: list[str]
     limitations: str | None
     medical_notes: str | None
     created_at: datetime

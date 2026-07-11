@@ -22,7 +22,7 @@ class ClientProfileModel(Base):
     goal: Mapped[str] = mapped_column(String(120), nullable=False)
     experience_level: Mapped[str] = mapped_column(String(32), nullable=False)
     workout_location: Mapped[str] = mapped_column(String(16), nullable=False)
-    equipment_json: Mapped[str] = mapped_column(Text, nullable=False)
+    unavailable_equipment_json: Mapped[str] = mapped_column(Text, nullable=False)
     limitations: Mapped[str | None] = mapped_column(Text, nullable=True)
     medical_notes: Mapped[str | None] = mapped_column(Text, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=False), nullable=False)

@@ -42,7 +42,7 @@ def test_upsert_and_get_profile_for_client_self() -> None:
                 "goal": "weight_loss",
                 "experience_level": "beginner",
                 "workout_location": "home",
-                "equipment": ["dumbbells", "resistance_bands"],
+                "unavailable_equipment": ["dumbbells", "resistance_bands"],
                 "limitations": "none",
                 "medical_notes": None,
             },
@@ -58,7 +58,7 @@ def test_upsert_and_get_profile_for_client_self() -> None:
         body = get_response.json()
         assert body["user_id"] == "client-1"
         assert body["full_name"] == "Client One"
-        assert body["equipment"] == ["dumbbells", "resistance_bands"]
+        assert body["unavailable_equipment"] == ["dumbbells", "resistance_bands"]
 
 
 def test_client_cannot_edit_other_user_profile() -> None:
@@ -74,7 +74,7 @@ def test_client_cannot_edit_other_user_profile() -> None:
                 "goal": "muscle_gain",
                 "experience_level": "intermediate",
                 "workout_location": "gym",
-                "equipment": [],
+                "unavailable_equipment": [],
                 "limitations": None,
                 "medical_notes": None,
             },
@@ -95,7 +95,7 @@ def test_client_profile_requires_questionnaire_fields() -> None:
                 "goal": None,
                 "experience_level": None,
                 "workout_location": None,
-                "equipment": [],
+                "unavailable_equipment": [],
                 "limitations": None,
                 "medical_notes": None,
             },
@@ -117,7 +117,7 @@ def test_trainer_cannot_edit_client_profile() -> None:
                 "goal": "muscle_gain",
                 "experience_level": "advanced",
                 "workout_location": "gym",
-                "equipment": ["barbell"],
+                "unavailable_equipment": ["barbell"],
                 "limitations": "knee",
                 "medical_notes": "monitor pain",
             },
@@ -138,7 +138,7 @@ def test_internal_questionnaire_status_endpoint() -> None:
                 "goal": "maintenance",
                 "experience_level": "beginner",
                 "workout_location": "home",
-                "equipment": ["none"],
+                "unavailable_equipment": [],
                 "limitations": None,
                 "medical_notes": None,
             },
@@ -164,6 +164,9 @@ def test_profile_meta_endpoint() -> None:
         assert "none" not in equipment_values
         assert "other" not in equipment_values
         assert "dumbbells" in equipment_values
+        assert "barbell" in equipment_values
+        assert "trx" not in equipment_values
+        assert "smith" not in equipment_values
 
 
 def test_missing_bearer_token_returns_401() -> None:
@@ -218,7 +221,7 @@ def test_trainer_can_save_own_profile_without_questionnaire() -> None:
                 "goal": None,
                 "experience_level": None,
                 "workout_location": None,
-                "equipment": [],
+                "unavailable_equipment": [],
                 "limitations": None,
                 "medical_notes": None,
             },
@@ -255,7 +258,7 @@ def test_internal_profile_name_summaries() -> None:
                 "goal": "maintenance",
                 "experience_level": "beginner",
                 "workout_location": "home",
-                "equipment": ["none"],
+                "unavailable_equipment": [],
                 "limitations": None,
                 "medical_notes": None,
             },
@@ -272,7 +275,7 @@ def test_internal_profile_name_summaries() -> None:
                 "goal": "maintenance",
                 "experience_level": "beginner",
                 "workout_location": "home",
-                "equipment": ["none"],
+                "unavailable_equipment": [],
                 "limitations": None,
                 "medical_notes": None,
             },

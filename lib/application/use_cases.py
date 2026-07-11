@@ -64,7 +64,7 @@ class ProfileService:
             goal=command.goal,
             experience_level=command.experience_level,
             workout_location=command.workout_location,
-            equipment=command.equipment,
+            unavailable_equipment=command.unavailable_equipment,
             limitations=command.limitations,
             medical_notes=command.medical_notes,
         )

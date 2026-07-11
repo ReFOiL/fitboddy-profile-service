@@ -11,7 +11,6 @@ class HealthResponse(BaseModel):
 ProfileGoal = Literal["weight_loss", "muscle_gain", "endurance", "maintenance", "rehabilitation"]
 ProfileLevel = Literal["beginner", "intermediate", "advanced"]
 ProfileWorkoutLocation = Literal["home", "gym"]
-ProfileEquipment = Literal["none", "dumbbells", "barbell", "resistance_bands", "kettlebell", "treadmill", "other"]
 
 
 class UpsertProfileRequest(BaseModel):
@@ -21,7 +20,7 @@ class UpsertProfileRequest(BaseModel):
     goal: ProfileGoal | None = Field(default=None)
     experience_level: ProfileLevel | None = Field(default=None)
     workout_location: ProfileWorkoutLocation | None = Field(default=None)
-    equipment: list[ProfileEquipment]
+    unavailable_equipment: list[str] = Field(default_factory=list)
     limitations: str | None = Field(default=None, max_length=1000)
     medical_notes: str | None = Field(default=None, max_length=1000)
 
@@ -37,7 +36,7 @@ class ProfileResponse(BaseModel):
     goal: str | None
     experience_level: str | None
     workout_location: str | None
-    equipment: list[ProfileEquipment]
+    unavailable_equipment: list[str]
     limitations: str | None
     medical_notes: str | None
     created_at: datetime

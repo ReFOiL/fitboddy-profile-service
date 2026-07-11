@@ -10,7 +10,7 @@ class UpsertProfileCommand:
     goal: str | None
     experience_level: str | None
     workout_location: str | None
-    equipment: list[str]
+    unavailable_equipment: list[str]
     limitations: str | None
     medical_notes: str | None
     acting_user_id: str

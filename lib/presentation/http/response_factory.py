@@ -16,7 +16,7 @@ class ProfileResponseFactory:
             goal=profile.goal,
             experience_level=profile.experience_level,
             workout_location=profile.workout_location,
-            equipment=profile.equipment,
+            unavailable_equipment=profile.unavailable_equipment,
             limitations=profile.limitations,
             medical_notes=profile.medical_notes,
             created_at=profile.created_at,

@@ -5,6 +5,7 @@ from fastapi import HTTPException, Response, status
 from application.errors import IntegrationError, ProfileError, UnauthorizedError
 from application.media_storage import MediaValidationError
 from application.runtime import ProfileApplicationRuntime
+from domain.equipment import CANONICAL_EQUIPMENT
 from presentation.http.error_translator import ErrorTranslator
 from presentation.http.request_factory import ProfileRequestFactory
 from presentation.http.response_factory import ProfileResponseFactory
@@ -110,11 +111,7 @@ class ProfileHttpHandler:
                 ProfileMetaOption(value="gym", label="Зал"),
             ],
             equipment=[
-                ProfileMetaOption(value="dumbbells", label="Гантели"),
-                ProfileMetaOption(value="barbell", label="Штанга"),
-                ProfileMetaOption(value="resistance_bands", label="Эспандеры / резинки"),
-                ProfileMetaOption(value="kettlebell", label="Гиря"),
-                ProfileMetaOption(value="treadmill", label="Беговая дорожка"),
+                ProfileMetaOption(value=value, label=label) for value, label in CANONICAL_EQUIPMENT
             ],
         )
 

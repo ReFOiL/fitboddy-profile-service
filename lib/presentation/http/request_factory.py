@@ -18,7 +18,7 @@ class ProfileRequestFactory:
             goal=payload.goal,
             experience_level=payload.experience_level,
             workout_location=payload.workout_location,
-            equipment=payload.equipment,
+            unavailable_equipment=list(payload.unavailable_equipment),
             limitations=payload.limitations,
             medical_notes=payload.medical_notes,
             acting_user_id=acting_user_id,
