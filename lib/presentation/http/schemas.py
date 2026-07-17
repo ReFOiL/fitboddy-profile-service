@@ -76,3 +76,10 @@ class ProfileNameSummaryItem(BaseModel):
 
 class ProfileNameSummariesResponse(BaseModel):
     items: list[ProfileNameSummaryItem]
+
+
+class AdminProfileListResponse(BaseModel):
+    items: list[ProfileResponse] = Field(default_factory=list)
+    total: int
+    page: int
+    page_size: int

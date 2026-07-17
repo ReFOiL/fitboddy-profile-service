@@ -94,8 +94,46 @@ class ProfileService:
             return {}
         return self._profiles.get_full_names_by_user_ids(self._PROFILE_TENANT_SCOPE, unique_ids)
 
+    def admin_list_profiles(self, *, query: str | None, page: int, page_size: int) -> tuple[list[ClientProfile], int]:
+        page = max(page, 1)
+        page_size = min(max(page_size, 1), 100)
+        offset = (page - 1) * page_size
+        rows, total = self._profiles.search(
+            tenant_id=self._PROFILE_TENANT_SCOPE,
+            query=query,
+            offset=offset,
+            limit=page_size,
+        )
+        return [self._mapper.to_domain(row) for row in rows], total
+
+    def admin_get_profile(self, user_id: str) -> ClientProfile:
+        model = self._profiles.find_by_tenant_user(self._PROFILE_TENANT_SCOPE, user_id)
+        if model is None:
+            raise ProfileNotFoundError("profile not found")
+        return self._mapper.to_domain(model)
+
+    def admin_upsert_profile(self, command: UpsertProfileCommand) -> ClientProfile:
+        self._validate_questionnaire(command)
+        model = self._profiles.upsert(
+            tenant_id=self._PROFILE_TENANT_SCOPE,
+            user_id=command.user_id,
+            full_name=command.full_name,
+            city=command.city,
+            bio=command.bio,
+            goal=command.goal,
+            experience_level=command.experience_level,
+            workout_location=command.workout_location,
+            unavailable_equipment=command.unavailable_equipment,
+            limitations=command.limitations,
+            medical_notes=command.medical_notes,
+        )
+        self._session.commit()
+        return self._mapper.to_domain(model)
+
     @staticmethod
     def _ensure_write_access(acting_user_id: str, acting_role: str, target_user_id: str) -> None:
+        if acting_role == "platform_admin":
+            return
         if acting_role == "client" and acting_user_id != target_user_id:
             raise ForbiddenError("client can update only own profile")
         if acting_role == "trainer" and acting_user_id != target_user_id:
@@ -103,6 +141,8 @@ class ProfileService:
 
     @staticmethod
     def _ensure_read_access(acting_user_id: str, acting_role: str, target_user_id: str) -> None:
+        if acting_role == "platform_admin":
+            return
         if acting_role == "client" and acting_user_id != target_user_id:
             raise ForbiddenError("client can read only own profile")
 
@@ -110,7 +150,8 @@ class ProfileService:
     def _validate_questionnaire(command: UpsertProfileCommand) -> None:
         # Trainer can keep personal profile without client questionnaire fields.
         is_trainer_own_profile = command.acting_role == "trainer" and command.acting_user_id == command.user_id
-        if is_trainer_own_profile:
+        is_admin = command.acting_role == "platform_admin"
+        if is_trainer_own_profile or is_admin:
             return
         if not (command.goal or "").strip():
             raise ProfileError("goal is required for client questionnaire")

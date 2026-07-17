@@ -17,8 +17,9 @@ class ProfileApplicationRuntime:
         self._settings = settings
         self._db_manager = DatabaseManager(settings.database_url)
         self._http_client = httpx.Client(timeout=settings.http_timeout_seconds)
+        self._auth_gateway = AuthGateway(http_client=self._http_client, auth_service_url=settings.auth_service_url)
         self._access_service = ProfileAccessService(
-            auth_gateway=AuthGateway(http_client=self._http_client, auth_service_url=settings.auth_service_url),
+            auth_gateway=self._auth_gateway,
             tenant_gateway=TenantGateway(http_client=self._http_client, tenant_service_url=settings.tenant_service_url),
         )
         self._avatar_storage = self._build_avatar_storage(settings)
@@ -26,6 +27,10 @@ class ProfileApplicationRuntime:
     @property
     def access_service(self) -> ProfileAccessService:
         return self._access_service
+
+    @property
+    def auth_gateway(self) -> AuthGateway:
+        return self._auth_gateway
 
     @property
     def avatar_storage(self) -> S3MediaStorage | None:

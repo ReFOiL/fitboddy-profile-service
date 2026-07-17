@@ -10,6 +10,7 @@ from presentation.http.error_translator import ErrorTranslator
 from presentation.http.request_factory import ProfileRequestFactory
 from presentation.http.response_factory import ProfileResponseFactory
 from presentation.http.schemas import (
+    AdminProfileListResponse,
     AvatarUploadResponse,
     ProfileMetaOption,
     ProfileMetaResponse,
@@ -157,6 +158,64 @@ class ProfileHttpHandler:
                 names_map = profile_service.get_profile_name_summaries(payload.user_ids)
                 items = [ProfileNameSummaryItem(user_id=user_id, full_name=names_map.get(user_id)) for user_id in payload.user_ids]
                 return ProfileNameSummariesResponse(items=items)
+        except ProfileError as exc:
+            self._error_translator.raise_http_error(exc)
+        raise AssertionError("unreachable")
+
+    def admin_list_profiles(
+        self,
+        *,
+        authorization: str | None,
+        query: str | None,
+        page: int,
+        page_size: int,
+    ) -> AdminProfileListResponse:
+        try:
+            access_token = self._extract_bearer_token(authorization)
+            self._runtime.auth_gateway.require_platform_admin(access_token)
+            with self._runtime.profile_service_scope() as profile_service:
+                items, total = profile_service.admin_list_profiles(query=query, page=page, page_size=page_size)
+                return AdminProfileListResponse(
+                    items=[self._response_factory.from_domain(item) for item in items],
+                    total=total,
+                    page=page,
+                    page_size=page_size,
+                )
+        except ProfileError as exc:
+            self._error_translator.raise_http_error(exc)
+        raise AssertionError("unreachable")
+
+    def admin_get_profile(self, *, authorization: str | None, user_id: str) -> ProfileResponse:
+        try:
+            access_token = self._extract_bearer_token(authorization)
+            self._runtime.auth_gateway.require_platform_admin(access_token)
+            with self._runtime.profile_service_scope() as profile_service:
+                profile = profile_service.admin_get_profile(user_id)
+                return self._response_factory.from_domain(profile)
+        except ProfileError as exc:
+            self._error_translator.raise_http_error(exc)
+        raise AssertionError("unreachable")
+
+    def admin_upsert_profile(
+        self,
+        *,
+        authorization: str | None,
+        user_id: str,
+        payload: UpsertProfileRequest,
+    ) -> ProfileResponse:
+        try:
+            access_token = self._extract_bearer_token(authorization)
+            admin = self._runtime.auth_gateway.require_platform_admin(access_token)
+            with self._runtime.profile_service_scope() as profile_service:
+                profile = profile_service.admin_upsert_profile(
+                    self._request_factory.to_upsert_command(
+                        user_id,
+                        payload,
+                        acting_user_id=admin.user_id,
+                        acting_role=admin.role,
+                    )
+                )
+                return self._response_factory.from_domain(profile)
         except ProfileError as exc:
             self._error_translator.raise_http_error(exc)
         raise AssertionError("unreachable")

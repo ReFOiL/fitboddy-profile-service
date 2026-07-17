@@ -4,7 +4,7 @@ import json
 from datetime import UTC, datetime
 from uuid import uuid4
 
-from sqlalchemy import select
+from sqlalchemy import func, or_, select
 from sqlalchemy.orm import Session
 
 from application.models import ClientProfileModel
@@ -97,6 +97,35 @@ class ClientProfileRepository:
         )
         rows = self._session.execute(statement).all()
         return {user_id: full_name for user_id, full_name in rows}
+
+    def search(
+        self,
+        *,
+        tenant_id: str,
+        query: str | None,
+        offset: int,
+        limit: int,
+    ) -> tuple[list[ClientProfileModel], int]:
+        statement = select(ClientProfileModel).where(ClientProfileModel.tenant_id == tenant_id)
+        count_statement = select(func.count()).select_from(ClientProfileModel).where(
+            ClientProfileModel.tenant_id == tenant_id
+        )
+        if query:
+            pattern = f"%{query.strip().lower()}%"
+            filter_expr = or_(
+                func.lower(ClientProfileModel.full_name).like(pattern),
+                ClientProfileModel.user_id.like(pattern),
+                func.lower(ClientProfileModel.city).like(pattern),
+            )
+            statement = statement.where(filter_expr)
+            count_statement = count_statement.where(filter_expr)
+        total = int(self._session.execute(count_statement).scalar_one())
+        rows = list(
+            self._session.execute(
+                statement.order_by(ClientProfileModel.updated_at.desc()).offset(offset).limit(limit)
+            ).scalars().all()
+        )
+        return rows, total
 
     def set_avatar_url(self, tenant_id: str, user_id: str, avatar_url: str) -> ClientProfileModel:
         profile = self.find_by_tenant_user(tenant_id, user_id)

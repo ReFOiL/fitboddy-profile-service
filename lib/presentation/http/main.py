@@ -8,6 +8,7 @@ from presentation.http.error_translator import ErrorTranslator
 from presentation.http.handlers.profile_handler import ProfileHttpHandler
 from presentation.http.request_factory import ProfileRequestFactory
 from presentation.http.response_factory import ProfileResponseFactory
+from presentation.http.routes.admin_routes import AdminRoutes
 from presentation.http.routes.profile_routes import ProfileRoutes
 from presentation.http.routes.system_routes import SystemRoutes
 
@@ -31,3 +32,4 @@ async def lifespan(app: FastAPI):
 app = FastAPI(title="profile-service", version="0.1.0", lifespan=lifespan)
 app.include_router(SystemRoutes().router)
 app.include_router(ProfileRoutes().router)
+app.include_router(AdminRoutes().router)

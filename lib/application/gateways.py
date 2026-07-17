@@ -44,6 +44,14 @@ class AuthGateway:
         payload = response.json()
         return AuthUser(user_id=payload["user_id"], tenant_id=payload["tenant_id"], role=payload["role"])
 
+    def require_platform_admin(self, access_token: str) -> AuthUser:
+        from application.errors import ForbiddenError
+
+        user = self.get_current_user(access_token)
+        if user.role != "platform_admin":
+            raise ForbiddenError("platform_admin role required")
+        return user
+
 
 class TenantGateway:
     def __init__(self, http_client: httpx.Client, tenant_service_url: str) -> None:
