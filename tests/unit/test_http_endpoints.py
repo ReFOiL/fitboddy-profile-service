@@ -39,6 +39,8 @@ def test_upsert_and_get_profile_for_client_self() -> None:
                 "full_name": "Client One",
                 "city": "Sydney",
                 "bio": "Love morning workouts",
+                "age": 28,
+                "gender": "female",
                 "goal": "weight_loss",
                 "experience_level": "beginner",
                 "workout_location": "home",
@@ -49,6 +51,8 @@ def test_upsert_and_get_profile_for_client_self() -> None:
         )
         assert upsert_response.status_code == 200
         assert upsert_response.json()["goal"] == "weight_loss"
+        assert upsert_response.json()["age"] == 28
+        assert upsert_response.json()["gender"] == "female"
 
         get_response = client.get(
             "/api/v1/profiles/client-1",
@@ -71,6 +75,8 @@ def test_client_cannot_edit_other_user_profile() -> None:
                 "full_name": "Client Two",
                 "city": None,
                 "bio": None,
+                "age": 30,
+                "gender": "male",
                 "goal": "muscle_gain",
                 "experience_level": "intermediate",
                 "workout_location": "gym",
@@ -92,9 +98,31 @@ def test_client_profile_requires_questionnaire_fields() -> None:
                 "full_name": "Client One",
                 "city": "Sydney",
                 "bio": "Bio",
+                "age": None,
+                "gender": None,
                 "goal": None,
                 "experience_level": None,
                 "workout_location": None,
+                "unavailable_equipment": [],
+                "limitations": None,
+                "medical_notes": None,
+            },
+        )
+        assert response.status_code == 400
+        assert "age is required" in response.json()["detail"]
+
+        response = client.put(
+            "/api/v1/profiles/client-1",
+            headers={"Authorization": "Bearer token"},
+            json={
+                "full_name": "Client One",
+                "city": "Sydney",
+                "bio": "Bio",
+                "age": 25,
+                "gender": "male",
+                "goal": None,
+                "experience_level": "beginner",
+                "workout_location": "home",
                 "unavailable_equipment": [],
                 "limitations": None,
                 "medical_notes": None,
@@ -114,6 +142,8 @@ def test_trainer_cannot_edit_client_profile() -> None:
                 "full_name": "Client Three",
                 "city": "Melbourne",
                 "bio": "Trainer updated profile",
+                "age": 32,
+                "gender": "male",
                 "goal": "muscle_gain",
                 "experience_level": "advanced",
                 "workout_location": "gym",
@@ -135,6 +165,8 @@ def test_internal_questionnaire_status_endpoint() -> None:
                 "full_name": "Client Five",
                 "city": None,
                 "bio": None,
+                "age": 27,
+                "gender": "female",
                 "goal": "maintenance",
                 "experience_level": "beginner",
                 "workout_location": "home",
@@ -158,8 +190,10 @@ def test_profile_meta_endpoint() -> None:
         assert isinstance(body["goals"], list)
         assert isinstance(body["levels"], list)
         assert isinstance(body["workout_locations"], list)
+        assert isinstance(body["genders"], list)
         assert isinstance(body["equipment"], list)
         assert any(item["value"] == "home" for item in body["workout_locations"])
+        assert {item["value"] for item in body["genders"]} == {"male", "female"}
         equipment_values = {item["value"] for item in body["equipment"]}
         assert "none" not in equipment_values
         assert "other" not in equipment_values
@@ -218,6 +252,8 @@ def test_trainer_can_save_own_profile_without_questionnaire() -> None:
                 "full_name": "Coach Alex",
                 "city": "Brisbane",
                 "bio": "Strength trainer",
+                "age": None,
+                "gender": None,
                 "goal": None,
                 "experience_level": None,
                 "workout_location": None,
@@ -229,6 +265,8 @@ def test_trainer_can_save_own_profile_without_questionnaire() -> None:
         assert response.status_code == 200
         assert response.json()["goal"] is None
         assert response.json()["experience_level"] is None
+        assert response.json()["age"] is None
+        assert response.json()["gender"] is None
 
 
 def test_avatar_media_proxy_success() -> None:
@@ -255,6 +293,8 @@ def test_internal_profile_name_summaries() -> None:
                 "full_name": "Анна Иванова",
                 "city": None,
                 "bio": None,
+                "age": 29,
+                "gender": "female",
                 "goal": "maintenance",
                 "experience_level": "beginner",
                 "workout_location": "home",
@@ -272,6 +312,8 @@ def test_internal_profile_name_summaries() -> None:
                 "full_name": "Борис Петров",
                 "city": None,
                 "bio": None,
+                "age": 34,
+                "gender": "male",
                 "goal": "maintenance",
                 "experience_level": "beginner",
                 "workout_location": "home",

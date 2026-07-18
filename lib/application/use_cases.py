@@ -61,6 +61,8 @@ class ProfileService:
             full_name=command.full_name,
             city=command.city,
             bio=command.bio,
+            age=command.age,
+            gender=command.gender,
             goal=command.goal,
             experience_level=command.experience_level,
             workout_location=command.workout_location,
@@ -120,6 +122,8 @@ class ProfileService:
             full_name=command.full_name,
             city=command.city,
             bio=command.bio,
+            age=command.age,
+            gender=command.gender,
             goal=command.goal,
             experience_level=command.experience_level,
             workout_location=command.workout_location,
@@ -153,6 +157,10 @@ class ProfileService:
         is_admin = command.acting_role == "platform_admin"
         if is_trainer_own_profile or is_admin:
             return
+        if command.age is None:
+            raise ProfileError("age is required for client questionnaire")
+        if not (command.gender or "").strip():
+            raise ProfileError("gender is required for client questionnaire")
         if not (command.goal or "").strip():
             raise ProfileError("goal is required for client questionnaire")
         if not (command.experience_level or "").strip():

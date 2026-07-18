@@ -11,12 +11,15 @@ class HealthResponse(BaseModel):
 ProfileGoal = Literal["weight_loss", "muscle_gain", "endurance", "maintenance", "rehabilitation"]
 ProfileLevel = Literal["beginner", "intermediate", "advanced"]
 ProfileWorkoutLocation = Literal["home", "gym"]
+ProfileGender = Literal["male", "female"]
 
 
 class UpsertProfileRequest(BaseModel):
     full_name: str | None = Field(default=None, max_length=120)
     city: str | None = Field(default=None, max_length=120)
     bio: str | None = Field(default=None, max_length=2000)
+    age: int | None = Field(default=None, ge=10, le=100)
+    gender: ProfileGender | None = Field(default=None)
     goal: ProfileGoal | None = Field(default=None)
     experience_level: ProfileLevel | None = Field(default=None)
     workout_location: ProfileWorkoutLocation | None = Field(default=None)
@@ -33,6 +36,8 @@ class ProfileResponse(BaseModel):
     avatar_url: str | None
     city: str | None
     bio: str | None
+    age: int | None
+    gender: str | None
     goal: str | None
     experience_level: str | None
     workout_location: str | None
@@ -62,6 +67,7 @@ class ProfileMetaResponse(BaseModel):
     goals: list[ProfileMetaOption]
     levels: list[ProfileMetaOption]
     workout_locations: list[ProfileMetaOption]
+    genders: list[ProfileMetaOption]
     equipment: list[ProfileMetaOption]
 
 

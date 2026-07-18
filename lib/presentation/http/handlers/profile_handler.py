@@ -111,6 +111,10 @@ class ProfileHttpHandler:
                 ProfileMetaOption(value="home", label="Дом"),
                 ProfileMetaOption(value="gym", label="Зал"),
             ],
+            genders=[
+                ProfileMetaOption(value="male", label="Мужской"),
+                ProfileMetaOption(value="female", label="Женский"),
+            ],
             equipment=[
                 ProfileMetaOption(value=value, label=label) for value, label in CANONICAL_EQUIPMENT
             ],

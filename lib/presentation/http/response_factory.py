@@ -13,6 +13,8 @@ class ProfileResponseFactory:
             avatar_url=profile.avatar_url,
             city=profile.city,
             bio=profile.bio,
+            age=profile.age,
+            gender=profile.gender,
             goal=profile.goal,
             experience_level=profile.experience_level,
             workout_location=profile.workout_location,

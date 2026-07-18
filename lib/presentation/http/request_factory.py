@@ -15,6 +15,8 @@ class ProfileRequestFactory:
             full_name=payload.full_name,
             city=payload.city,
             bio=payload.bio,
+            age=payload.age,
+            gender=payload.gender,
             goal=payload.goal,
             experience_level=payload.experience_level,
             workout_location=payload.workout_location,

@@ -24,6 +24,8 @@ class ClientProfileRepository:
         full_name: str | None,
         city: str | None,
         bio: str | None,
+        age: int | None,
+        gender: str | None,
         goal: str | None,
         experience_level: str | None,
         workout_location: str | None,
@@ -33,6 +35,7 @@ class ClientProfileRepository:
     ) -> ClientProfileModel:
         profile = self.find_by_tenant_user(tenant_id, user_id)
         now = datetime.now(UTC).replace(tzinfo=None)
+        normalized_gender = (gender or "").strip()
         normalized_goal = (goal or "").strip()
         normalized_experience_level = (experience_level or "").strip()
         normalized_workout_location = (workout_location or "").strip()
@@ -45,6 +48,8 @@ class ClientProfileRepository:
                 full_name=full_name,
                 city=city,
                 bio=bio,
+                age=age,
+                gender=normalized_gender,
                 goal=normalized_goal,
                 experience_level=normalized_experience_level,
                 workout_location=normalized_workout_location,
@@ -58,6 +63,8 @@ class ClientProfileRepository:
             self._session.flush()
             return profile
 
+        profile.age = age
+        profile.gender = normalized_gender
         profile.goal = normalized_goal
         profile.experience_level = normalized_experience_level
         profile.workout_location = normalized_workout_location
@@ -83,7 +90,9 @@ class ClientProfileRepository:
         if profile is None:
             return False
         return (
-            bool((profile.goal or "").strip())
+            profile.age is not None
+            and bool((profile.gender or "").strip())
+            and bool((profile.goal or "").strip())
             and bool((profile.experience_level or "").strip())
             and bool((profile.workout_location or "").strip())
         )
@@ -139,6 +148,8 @@ class ClientProfileRepository:
                 avatar_url=avatar_url,
                 city=None,
                 bio=None,
+                age=None,
+                gender="",
                 goal="",
                 experience_level="",
                 workout_location="",
@@ -174,6 +185,8 @@ class ClientProfileMapper:
             avatar_url=model.avatar_url,
             city=model.city,
             bio=model.bio,
+            age=model.age,
+            gender=model.gender if (model.gender or "").strip() else None,
             goal=model.goal if model.goal.strip() else None,
             experience_level=model.experience_level if model.experience_level.strip() else None,
             workout_location=model.workout_location if model.workout_location.strip() else None,

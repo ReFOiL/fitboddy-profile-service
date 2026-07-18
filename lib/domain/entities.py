@@ -11,6 +11,8 @@ class ClientProfile:
     avatar_url: str | None
     city: str | None
     bio: str | None
+    age: int | None
+    gender: str | None
     goal: str | None
     experience_level: str | None
     workout_location: str | None

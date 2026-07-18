@@ -7,6 +7,8 @@ class UpsertProfileCommand:
     full_name: str | None
     city: str | None
     bio: str | None
+    age: int | None
+    gender: str | None
     goal: str | None
     experience_level: str | None
     workout_location: str | None
