@@ -18,3 +18,11 @@ env/
 .coverage
 .coverage.*
 htmlcov/
+
+*.db
+*.sqlite
+*.sqlite3
+
+.env
+.env.local
+.env.*.local
